@@ -1,0 +1,39 @@
+extends layout
+block content
+    .chat-panel.panel.panel-default
+        .panel-heading
+            i.fa.fa-comments.fa-fw(id='user_count')
+            |                              Kişi Şu anda Chat yapıyor!
+        // /.panel-heading
+        .panel-body
+            ul#messages.chat
+    form(action='')
+        .panel-footer
+            .input-group
+                input#btn-input.form-control.input-sm(type='text', placeholder='Type your message here...')
+                span.input-group-btn
+                    button#btn-chat.btn.btn-warning.btn-sm
+                        | Send
+        // /.panel-footer
+    script(src='https://cdn.socket.io/socket.io-1.2.0.js')
+    script(src='http://code.jquery.com/jquery-1.11.1.js')
+    script.
+        var socket = io();
+        var id = Math.floor((Math.random() * 10000000000) + 1);
+        $('form').submit(function () {
+            socket.emit('chat message', {msg: $('#btn-input').val(), uname: id});
+            $('#btn-input').val('');
+            return false;
+        });
+
+        socket.on('chat message', function (msg) {
+          var d = new Date();
+          var curr_hour = d.getHours();
+          var curr_min = d.getMinutes();
+          var curr_sec = d.getSeconds();
+
+            $('#messages').append('<li class="left clearfix"><span class="chat-img pull-left"><img src="http://www.cssdesignawards.com/cdasites/2013/201302/20130218091821.jpg" alt="User Avatar" class="img-circle"></span><div class="chat-body clearfix"><div class="header"><strong id="uname" class="primary-font">' + msg.uname + '</strong><small class="pull-right text-muted"><i class="fa fa-clock-o fa-fw"></i>'+ curr_hour + ":" + curr_min + ":" + curr_sec  +'</small></div><p>' + msg.msg + '</p></div></li>');
+        });
+        socket.on('user', function (userc) {
+            $('#user_count').text(userc);
+        });
